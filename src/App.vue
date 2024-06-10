@@ -111,7 +111,7 @@ import {
   parseData,
 } from "./lib";
 import { onMounted, reactive, ref, watchEffect } from "vue";
-
+import type { Ref } from 'vue'
 const rawData = [
   "Permission.Indentity.User.Read",
   "Permission.Indentity.User.Create",
@@ -130,19 +130,24 @@ const rawData = [
   "Permission.Tiktok.Customer.Create",
 ];
 
+interface IRoles{
+  name: string,
+  permissions:string[]
+}
+
 const { pers } = reactive(modifyPermissions(rawData));
-const checkall = ref(false);
-const checkedMethods = ref([]);
-const checkedResource = ref([]);
+const checkall: Ref<boolean> = ref(false);
+const checkedMethods: Ref<string[]> = ref([]);
+const checkedResource: Ref<string[]>= ref([]);
 
 const newMofify = reactive(parseData(rawData));
-const newRoles = reactive<{name: string, permissions:string[]}>({
+const newRoles:IRoles = reactive({
   name: "",
   permissions: [],
 });
 
-const handleChooseAll = (e) => {
-  const checked = e.target.checked;
+const handleChooseAll = (e:Event) => {
+  const checked =(e.target as HTMLInputElement).checked;
   if (checked) {
     newRoles.permissions = rawData;
     checkall.value = true;
@@ -154,8 +159,8 @@ const handleChooseAll = (e) => {
   }
 };
 
-const chooseMethods = (e, m) => {
-  const checked = e.target.checked;
+const chooseMethods = (e:Event, m:string) => {
+  const checked =(e.target as HTMLInputElement).checked;
   const inputs = document.querySelectorAll(`input[data-method='${m}']`);
   inputs.forEach((input: any) => {
     const value = input.value;
@@ -172,8 +177,8 @@ const chooseMethods = (e, m) => {
   });
 };
 
-const chooseResource = (e, target) => {
-  const checked = e.target.checked;
+const chooseResource = (e:Event, target:string) => {
+  const checked =(e.target as HTMLInputElement).checked;
   const inputs = document.querySelectorAll(`input[data-resouce='${target}']`);
   inputs.forEach((input: any) => {
     const value = input.value;
@@ -199,7 +204,7 @@ watchEffect(() => {
     checkall.value = false;
   }
   const test = reduceData(
-    newRoles.permissions.flatMap((i) => i.split(".")?.at(-1)),
+    newRoles.permissions.flatMap((i:any) => i.split(".")?.at(-1)),
   );
   const { recordInMethods } = modifyPermissions(rawData);
   const newMatch = matchingTwoObject(recordInMethods, test);
